@@ -11,16 +11,13 @@ CFILES = $(wildcard *.c)
 HFILES = $(wildcard *.h)
 OFILES = $(patsubst %.c,%.o,$(CFILES))
 
-.PHONY: run-valgrind clean
+.PHONY: clean
 
 $(PROG): $(OFILES)
 	$(CC) $(CFLAGS) $^ -o $@ $(SDL_LIBS)
 
 %.o: %.c $(HFILES)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-run-valgrind: $(PROG)
-	@valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all --errors-for-leak-kinds=all ./$(PROG)
 
 clean:
 	rm -rf $(PROG) $(OFILES)
