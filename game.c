@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include "graphics.h"
 
-// TODO: remove me
-#include <SDL.h>
-
 #define WIDTH 640
 #define HEIGHT 480
 
@@ -18,14 +15,16 @@ int main(void) {
     uint32_t off = 0;
     int color_idx = 2;
     while (!quit) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYUP) {
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    color_idx = (color_idx + 1) % 3;
-                } else if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    quit = 1;
-                }
+        int key;
+        while ((key = graphics_get_keypress())) {
+            switch (key) {
+            case ' ':
+                color_idx = (color_idx + 1) % 3;
+                break;
+            case 'q':
+            case ASCII_ESC:
+                quit = 1;
+                break;
             }
         }
 

@@ -29,6 +29,19 @@ int graphics_setup(int width, int height) {
     return 0;
 }
 
+int graphics_get_keypress(void) {
+    SDL_Event event;
+    if (SDL_PollEvent(&event)
+            && event.type == SDL_KEYUP
+            // Don't send them back 0 until we've processed all events
+            && event.key.keysym.sym != SDLK_UNKNOWN) {
+        return event.key.keysym.sym;
+    } else {
+        // Sentinel value meaning no keypress
+        return '\0';
+    }
+}
+
 int graphics_render(uint32_t *pixels) {
     if (SDL_UpdateTexture(texture, NULL, pixels, pixelbuf_width*sizeof (uint32_t)) < 0
         || SDL_RenderClear(renderer) < 0
