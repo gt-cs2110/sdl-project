@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "graphics.h"
 
 #define WIDTH 640
