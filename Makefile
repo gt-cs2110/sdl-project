@@ -1,31 +1,26 @@
-# Makefile for CS 2110 Homework 11, Spring 2018
+# Need the libsdl2-dev Debian package
 
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Werror -Wextra -Wstrict-prototypes -Wold-style-definition
-CHECK_LIBS = $(shell pkg-config --cflags --libs check)
+SDL_CFLAGS = $(shell pkg-config --cflags sdl2)
+CFLAGS = -g -std=c99 -pedantic -Wall -Werror -Wextra -Wstrict-prototypes -Wold-style-definition $(SDL_CFLAGS)
+SDL_LIBS = $(shell pkg-config --libs sdl2)
 
+PROG = game
 # The C and H files
-CFILES = my_malloc.c tests.c $(patsubst %.c,%.o,$(wildcard suites/*.c))
-HFILES = my_malloc.h my_sbrk.h suites/suites.h
+CFILES = $(wildcard *.c)
+HFILES = $(wildcard *.h)
 OFILES = $(patsubst %.c,%.o,$(CFILES))
 
-.PHONY: run-tests run-gdb run-valgrind clean
+.PHONY: run-valgrind clean
 
-tests: $(OFILES)
-	./verify.sh
-	$(CC) $(CFLAGS) $^ -o $@ $(CHECK_LIBS)
+$(PROG): $(OFILES)
+	$(CC) $(CFLAGS) $^ -o $@ $(SDL_LIBS)
 
 %.o: %.c $(HFILES)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-run-tests: tests
-	mkdir -p actual
-	mkdir -p diff
-	./tests $(TEST)
-	./difference.sh
-
-run-gdb: tests
-	CK_FORK=no gdb --args ./tests $(TEST)
+run-valgrind: $(PROG)
+	@valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all --errors-for-leak-kinds=all ./$(PROG)
 
 clean:
-	rm -rf tests $(OFILES)
+	rm -rf $(PROG) $(OFILES)
